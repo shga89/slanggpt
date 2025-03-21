@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ user.username }} 님의 채팅 기록</h1>
+    <table>
+        <thead>
+            <tr><th>시간</th><th>메시지</th><th>응답</th></tr>
+        </thead>
+        <tbody>
+            {% for chat in chats %}
+            <tr>
+                <td>{{ chat.timestamp }}</td>
+                <td>{{ chat.message }}</td>
+                <td>{{ chat.response }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
