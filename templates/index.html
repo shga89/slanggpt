@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h1>Gemini Chatbot</h1>
+        {% if show_terms_popup %}
+            <div id="termsModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2>이용 약관</h2>
+                    <p>...</p>
+                    <form method="POST" action="{{ url_for('index') }}">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="terms_agreed" value="true">
+                        <button type="submit">동의</button>
+                    </form>
+                    <button onclick="closeModal()">동의하지 않음</button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="chat-main">
+        <div class="chat-list">
+            <h2>채팅 목록</h2>
+            <ul>
+                <li>
+                    <form method="POST" action="{{ url_for('index') }}">
+                        <input type="hidden" name="new_chat" value="true">
+                        <button type="submit" class="new-chat-button">새 채팅</button>
+                    </form>
+                </li>
+                {% for conversation in conversations %}
+                <li>
+                    <a href="{{ url_for('index', conversation_id=conversation.id) }}"
+                       class="{% if conversation.id == current_conversation_id|int %}active{% endif %}">
+                        {{ conversation.title }}
+                    </a>
+                     <form method="POST" action="{{ url_for('delete_conversation', conversation_id=conversation.id) }}" style="display: inline;">
+                        <button type="submit" class="delete-button" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+        <div class="chat-history" id="chat-history-container">
+            <ul>
+                {% for chat in chat_history %}
+                <li>
+                    <div class="message {% if chat.user_id %}user-message{% else %}guest-message{% endif %}">
+                        <span class="sender">{% if chat.user_id %}{{ chat.user.username }}{% else %}Guest{% endif %}:</span>
+                        <span class="text">{{ chat.message }}</span>
+                    </div>
+                    <div class="message gemini-message">
+                        <span class="sender">Gemini:</span>
+                        <span class="text">{{ chat.response | markdown }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+    <div class="chat-input-area">
+            <form method="POST" action="{{ url_for('index') }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.message(placeholder="메시지를 입력하세요...", class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    window.onload = function() {
+      var termsAgreed = getCookie("terms_agreed");
+      var showPopup = document.getElementById('termsModal');
+
+      if (showPopup && !termsAgreed) {
+        showPopup.style.display = 'block';
+      }
+
+        {% if scroll_to_bottom %}
+            scrollToBottom();
+        {% endif %}
+    };
+</script>
+{% endblock %}
