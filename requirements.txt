@@ -1,0 +1,9 @@
+# requirements.txt
+flask
+flask-sqlalchemy
+flask-login
+flask-wtf
+flask-migrate
+python-dotenv
+werkzeug
+google-generativeai
